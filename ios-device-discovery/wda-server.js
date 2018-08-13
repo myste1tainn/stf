@@ -126,15 +126,10 @@ class WDAServer {
     let hostname = 'localhost'
     console.log(`Trying to (re)start WDA server on ${hostname}:${this.runningPort}`)
 
-    try {
-      await this.createScriptFile()
-      await this.runScriptFile()
-      // TODO: Upon this line, means the the script is successfully ran, status should be sent to STF to let it know that device is ready for test.
-    } catch (error) {
-      console.error('WDA Server cannot be started, failed creating script file', error)
-    } finally {
-      await this.deleteScriptFile()
-    }
+    await this.createScriptFile()
+    await this.runScriptFile()
+    // TODO: Upon this line, means the script is successfully ran, status should be sent to STF to let it know that device is ready for test.
+    await this.deleteScriptFile()
   }
 
   ensureToolExistence() {
