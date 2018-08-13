@@ -1,10 +1,10 @@
-var iosDevice = require('node-ios-device')
-var zmqutil = require('../lib/util/zmqutil')
-var wireutil = require('../lib/wire/util')
-var wire = require('../lib/wire')
-var srv = require('../lib/util/srv')
-var solo = wireutil.makePrivateChannel()
-var Promise = require('bluebird')
+const iosDevice = require('node-ios-device')
+const zmqutil = require('../lib/util/zmqutil')
+const wireutil = require('../lib/wire/util')
+const wire = require('../lib/wire')
+const srv = require('../lib/util/srv')
+const solo = wireutil.makePrivateChannel()
+const Promise = require('bluebird')
 
 
 let endpoints = ['tcp://127.0.0.1:7116']
@@ -50,8 +50,14 @@ iosDevice.trackDevices().on('devices', function(devices) {
 
 
     setTimeout(function() {
-      let deploy = require('ios-deploy')
     }, 2000)
   })
 })
 
+require('./wda-server').restart()
+  .then(() => console.log('WDA server started'))
+  .catch(e => console.log('WDA server boot-up failed', e))
+
+require('./device-heartbeat').run()
+  .then(() => console.log('Device heartbeat finished'))
+  .catch(e => console.log('Device heartbeat checking failed', e))
