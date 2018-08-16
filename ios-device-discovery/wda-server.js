@@ -1,5 +1,7 @@
-let fs = require('fs')
-let {exec} = require('child_process')
+const fs = require('fs')
+const util = require('util')
+const exec = util.promisify(require('child_process').exec)
+const spawn = require('child_process').spawn
 
 let WDA_SERVER_INSTANCE = null
 let MAX_REAL_DEVICE_RESTART_RETRIES = 5
@@ -127,9 +129,9 @@ class WDAServer {
     console.log(`Trying to (re)start WDA server on ${hostname}:${this.runningPort}`)
 
     await this.createScriptFile()
-    await this.runScriptFile()
-    // TODO: Upon this line, means the script is successfully ran, status should be sent to STF to let it know that device is ready for test.
+    const results = await this.runScriptFile()
     await this.deleteScriptFile()
+    return results
   }
 
   ensureToolExistence() {
@@ -142,7 +144,7 @@ class WDAServer {
 
   async createScriptFile() {
     let contentLines = ['#!/bin/bash']
-    // TODO: Enable keycahin unlock
+    // TODO: Enable keychain unlock
     // contentLines.push(this.unlockKeychainCommandLine)
     contentLines.push(this.iproxyCommandLine)
     contentLines.push(`USE_PORT=${this.runningPort}`)
@@ -151,32 +153,33 @@ class WDAServer {
     return await exec('chmod +x ./script.sh')
   }
 
-  runScriptFile() {
-    exec('./script.sh', {maxBuffer: 1024 * 1024 * 500}, (error, stdout, stderror) => {
-      if (error) {
-        console.log(error)
-      } else if (stdout) {
-        console.log('Program result', stdout)
-      } else if (stderror) {
-        console.log('Program error', stderror)
-      } else {
-        console.log('Script file run')
-      }
+  async runScriptFile() {
+    const scriptShell = spawn('./script.sh')
+    let timeout = null
+    let once = false
+    return new Promise((resolve, reject) => {
+      scriptShell.stdout.on('data', data => {
+        let string = data.toString()
+        if (string.indexOf('Check dependencies') > -1) {
+          if (timeout) clearTimeout(timeout)
+          timeout = setTimeout(() => {
+            console.log('Installing WDA...')
+            resolve(true)
+          }, 20000)
+        } else if (string.indexOf('BUILD SUCCEEDED') > -1) {
+          console.log('WDA built finished')
+        } else if (string.indexOf('CLEAN TARGET') > -1) {
+          if (!once) {
+            console.log('Cleaning WDA project...')
+            once = true
+          }
+        }
+      })
     })
   }
 
   async deleteScriptFile() {
-    exec('rm -rf script.sh', (error, stdout, stderror) => {
-      if (error) {
-        console.log(error)
-      } else if (stdout) {
-        console.log('Program result', stdout)
-      } else if (stderror) {
-        console.log('Program error', stderror)
-      } else {
-        console.log('Script file deleted')
-      }
-    })
+    return exec('rm -rf script.sh')
   }
 }
 

@@ -35,7 +35,13 @@ iosDevice.trackDevices().on('devices', function(devices) {
   })
 })
 
-require('./wda-server').restart()
-  .then(() => require('./device-heartbeat').run())
+const deviceHeartbeat = require('./device-heartbeat')
+const wdaServer = require('./wda-server')
+wdaServer
+  .restart()
+  .then(() => {
+    console.log('Monitoring heartbeats...')
+    deviceHeartbeat.run()
+  })
   .catch(e => console.log('WDA server boot-up failed', e))
 
