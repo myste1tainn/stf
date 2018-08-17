@@ -1,8 +1,0 @@
-2018-08-13T23:13:30.766744000 0.009285s notice: Recursively removing directory /Users/Myste1tainn/Desktop/stf/ios-device-discovery/rethinkdb_data/tmp
-2018-08-13T23:13:30.769085000 0.011634s notice: Initializing directory /Users/Myste1tainn/Desktop/stf/ios-device-discovery/rethinkdb_data
-2018-08-13T23:13:30.769355000 0.011896s info: Creating a default database for your convenience. (This is because you ran 'rethinkdb' without 'create', 'serve', or '--join', and the directory '/Users/Myste1tainn/Desktop/stf/ios-device-discovery/rethinkdb_data' did not already exist or is empty.)
-2018-08-13T23:13:30.769400000 0.011941s notice: Running rethinkdb 2.3.6 (CLANG 9.0.0 (clang-900.0.37))...
-2018-08-13T23:13:30.773943000 0.016501s notice: Running on Darwin 17.7.0 x86_64
-2018-08-13T23:13:30.774029000 0.016570s notice: Loading data from directory /Users/Myste1tainn/Desktop/stf/ios-device-discovery/rethinkdb_data
-2018-08-13T23:13:30.937703000 0.180249s info: Automatically using cache size of 2755 MB
-2018-08-13T23:13:30.939209000 0.181755s error: TCP socket creation failed for port 29015: Address already in use.
